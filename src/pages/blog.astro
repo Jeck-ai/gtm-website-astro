@@ -5,6 +5,11 @@ import Layout from "@/layouts/Layout.astro";
 import Container from "@/components/container.astro";
 import Sectionhead from "@/components/sectionhead.astro";
 
+// Ensure BASE_URL ends with a slash
+const baseUrl = import.meta.env.BASE_URL.endsWith('/') 
+  ? import.meta.env.BASE_URL 
+  : import.meta.env.BASE_URL + '/';
+
 // Filter blog entries with 'draft: false' & date before current date
 const publishedBlogEntries = await getCollection("blog", ({ data }) => {
   return !data.draft && data.publishDate < new Date();
@@ -29,7 +34,7 @@ publishedBlogEntries.sort(function (a, b) {
         {
           publishedBlogEntries.map((blogPostEntry, index) => (
             <li>
-              <a href={`/blog/${blogPostEntry.slug}`}>
+              <a href={`${baseUrl}blog/${blogPostEntry.slug}`}>
                 <div class="grid md:grid-cols-2 gap-5 md:gap-10 items-center">
                   <Picture
                     src={blogPostEntry.data.image.src}

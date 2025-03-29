@@ -1,0 +1,493 @@
+---
+---
+<div id="three-container" class="fixed top-0 left-0 w-full h-full overflow-hidden" style="z-index: -10;"></div>
+
+
+
+<script>
+  // Ensure THREE is loaded and available before we continue
+  console.log('Starting DynamicPoints initialization');
+  
+  function updateDebug(message) {
+    // Debug function disabled
+    // console.log(message);
+  }
+  
+  updateDebug('Script started');
+  
+  function loadThreeJS() {
+    return new Promise((resolve, reject) => {
+      if (window.THREE) {
+        updateDebug('THREE already loaded');
+        resolve(window.THREE);
+        return;
+      }
+      
+      // First try using the installed three.js from node_modules
+      try {
+        updateDebug('Trying to use imported THREE from package');
+        import('three').then(THREE => {
+          updateDebug('THREE imported from package');
+          window.THREE = THREE;
+          resolve(THREE);
+        }).catch(err => {
+          updateDebug(`Package import failed: ${err.message}`);
+          loadFromCDN();
+        });
+      } catch (err) {
+        updateDebug(`Import error: ${err.message}`);
+        loadFromCDN();
+      }
+      
+      function loadFromCDN() {
+        updateDebug('Loading THREE from unpkg CDN');
+        const script = document.createElement('script');
+        // Use unpkg as an alternative CDN
+        script.src = 'https://unpkg.com/three@0.175.0/build/three.min.js';
+        script.onload = () => {
+          updateDebug('THREE loaded from unpkg CDN');
+          resolve(window.THREE);
+        };
+        script.onerror = (cdnErr) => {
+          updateDebug('Failed to load THREE from unpkg CDN');
+          
+          // Try one more CDN as fallback
+          updateDebug('Trying skypack CDN as last resort');
+          const fallbackScript = document.createElement('script');
+          fallbackScript.src = 'https://cdn.skypack.dev/three@0.175.0';
+          fallbackScript.onload = () => {
+            updateDebug('THREE loaded from skypack CDN');
+            resolve(window.THREE);
+          };
+          fallbackScript.onerror = (fallbackErr) => {
+            updateDebug('All THREE loading attempts failed');
+            reject(new Error('Failed to load THREE.js from any source'));
+          };
+          document.head.appendChild(fallbackScript);
+        };
+        document.head.appendChild(script);
+      }
+    });
+  }
+  
+  // Check for WebGL support
+  function isWebGLAvailable() {
+    try {
+      const canvas = document.createElement('canvas');
+      return !!(window.WebGLRenderingContext && 
+        (canvas.getContext('webgl') || canvas.getContext('experimental-webgl')));
+    } catch (e) {
+      updateDebug('WebGL not supported: ' + e);
+      return false;
+    }
+  }
+
+  // Constants - reduce particle count for better performance
+  const SEPARATION = 60;
+  const AMOUNTX = 40;
+  const AMOUNTY = 40;
+
+  function initDynamicPoints(THREE) {
+    // Try the advanced shader-based version first
+    try {
+      initAdvancedEffect(THREE);
+    } catch (error) {
+      // If the advanced version fails, fall back to a simpler version
+      updateDebug(`Advanced effect failed: ${error.message}`);
+      updateDebug('Trying simple effect instead');
+      try {
+        initSimpleEffect(THREE);
+      } catch (simpleError) {
+        updateDebug(`Simple effect also failed: ${simpleError.message}`);
+      }
+    }
+  }
+  
+  function initSimpleEffect(THREE) {
+    updateDebug('Initializing simple effect');
+    
+    if (!isWebGLAvailable()) {
+      updateDebug('WebGL not supported');
+      return;
+    }
+    
+    let container = document.getElementById('three-container');
+    if (!container) {
+      updateDebug('Container not found');
+      return;
+    }
+    
+    // Scene setup
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x050510);
+    
+    // Camera
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    camera.position.z = 100;
+    
+    // Renderer
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setClearColor(0x000000, 0); // Transparent background
+    
+    // Clear container
+    while (container.firstChild) {
+      container.removeChild(container.firstChild);
+    }
+    container.appendChild(renderer.domElement);
+    
+    // Create particles
+    const particleCount = 1000;
+    const particles = new THREE.Group();
+    
+    // Create a simple circle geometry for particles
+    const particleGeometry = new THREE.BufferGeometry();
+    const positions = new Float32Array(particleCount * 3);
+    const colors = new Float32Array(particleCount * 3);
+    
+    // Fill with random positions
+    for (let i = 0; i < particleCount; i++) {
+      const i3 = i * 3;
+      // Position
+      positions[i3] = Math.random() * 200 - 100;
+      positions[i3 + 1] = Math.random() * 200 - 100;
+      positions[i3 + 2] = Math.random() * 200 - 100;
+      
+      // Color (blue to green to indigo gradient)
+      const colorChoice = Math.random();
+      if (colorChoice < 0.33) {
+        colors[i3] = 0.23; // R (59/255)
+        colors[i3 + 1] = 0.51; // G (130/255) 
+        colors[i3 + 2] = 0.96; // B (246/255)
+      } else if (colorChoice < 0.66) {
+        colors[i3] = 0.06; // R (16/255)
+        colors[i3 + 1] = 0.73; // G (185/255)
+        colors[i3 + 2] = 0.51; // B (129/255)
+      } else {
+        colors[i3] = 0.39; // R (99/255)
+        colors[i3 + 1] = 0.40; // G (102/255)
+        colors[i3 + 2] = 0.94; // B (241/255)
+      }
+    }
+    
+    particleGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    particleGeometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+    
+    // Material
+    const particleMaterial = new THREE.PointsMaterial({
+      size: 2,
+      vertexColors: true,
+      transparent: true,
+      opacity: 0.8
+    });
+    
+    // Create the particle system
+    const particleSystem = new THREE.Points(particleGeometry, particleMaterial);
+    scene.add(particleSystem);
+    
+    // Mouse movement tracking for interactivity
+    let mouseX = 0, mouseY = 0;
+    
+    document.addEventListener('mousemove', (event) => {
+      mouseX = (event.clientX / window.innerWidth) * 2 - 1;
+      mouseY = -(event.clientY / window.innerHeight) * 2 + 1;
+    });
+    
+    // Handle window resize
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+    
+    // Animation loop
+    let frame = 0;
+    function animate() {
+      requestAnimationFrame(animate);
+      
+      frame += 0.01;
+      
+      // Rotate the particle system based on mouse position
+      particleSystem.rotation.y += 0.002;
+      particleSystem.rotation.x += Math.sin(frame * 0.1) * 0.001;
+      
+      // Gently move particles
+      const positions = particleSystem.geometry.attributes.position.array;
+      
+      for (let i = 0; i < particleCount; i++) {
+        const i3 = i * 3;
+        positions[i3 + 1] += Math.sin(frame + i * 0.1) * 0.1;
+      }
+      
+      particleSystem.geometry.attributes.position.needsUpdate = true;
+      
+      // Add subtle camera movement based on mouse position
+      camera.position.x += (mouseX * 30 - camera.position.x) * 0.05;
+      camera.position.y += (mouseY * 30 - camera.position.y) * 0.05;
+      camera.lookAt(scene.position);
+      
+      renderer.render(scene, camera);
+    }
+    
+    animate();
+    updateDebug('Simple animation started');
+  }
+  
+  function initAdvancedEffect(THREE) {
+    updateDebug('initAdvancedEffect called');
+    
+    if (!isWebGLAvailable()) {
+      updateDebug('WebGL not supported');
+      throw new Error('WebGL not supported');
+    }
+    
+    let container = document.getElementById('three-container');
+    if (!container) {
+      updateDebug('Container not found');
+      throw new Error('Container not found');
+    }
+    
+    try {
+      let camera, scene, renderer;
+      let particles, count = 0;
+      let mouseX = 0, mouseY = 0;
+
+      let windowHalfX = window.innerWidth / 2;
+      let windowHalfY = window.innerHeight / 2;
+
+      // Camera
+      camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 10000);
+      camera.position.z = 1000;
+
+      // Scene
+      scene = new THREE.Scene();
+      scene.fog = new THREE.FogExp2(0x050510, 0.0007);
+
+      // Particles
+      const numParticles = AMOUNTX * AMOUNTY;
+      const positions = new Float32Array(numParticles * 3);
+      const scales = new Float32Array(numParticles);
+
+      let i = 0, j = 0;
+
+      for (let ix = 0; ix < AMOUNTX; ix++) {
+        for (let iy = 0; iy < AMOUNTY; iy++) {
+          positions[i] = ix * SEPARATION - ((AMOUNTX * SEPARATION) / 2);
+          positions[i + 1] = 0;
+          positions[i + 2] = iy * SEPARATION - ((AMOUNTY * SEPARATION) / 2);
+
+          scales[j] = 1;
+
+          i += 3;
+          j++;
+        }
+      }
+
+      updateDebug('Creating geometry');
+      const geometry = new THREE.BufferGeometry();
+      geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+      geometry.setAttribute('scale', new THREE.BufferAttribute(scales, 1));
+
+      // Material with custom shaders
+      updateDebug('Creating shader material');
+      const material = new THREE.ShaderMaterial({
+        uniforms: {
+          time: { value: 0 }
+        },
+        vertexShader: `
+          attribute float scale;
+          uniform float time;
+          
+          varying float vTime;
+          
+          void main() {
+            vTime = time;
+            vec3 pos = position;
+            
+            // Simplified wave pattern
+            pos.y = sin(time * 0.1 + (pos.x + pos.z) * 0.01) * 100.0;
+            
+            vec4 mvPosition = modelViewMatrix * vec4(pos, 1.0);
+            
+            // Simplified point sizing
+            gl_PointSize = scale * (300.0 / -mvPosition.z);
+            gl_Position = projectionMatrix * mvPosition;
+          }
+        `,
+        fragmentShader: `
+          varying float vTime;
+          
+          void main() {
+            // Simple circular point
+            vec2 center = vec2(0.5, 0.5);
+            float dist = length(gl_PointCoord - center);
+            
+            // Discard pixels outside the circle
+            if (dist > 0.5) discard;
+            
+            // Simple blue color
+            vec3 color = vec3(0.12, 0.51, 0.96);
+            gl_FragColor = vec4(color, 0.7);
+          }
+        `,
+        blending: THREE.AdditiveBlending,
+        depthTest: false,
+        transparent: true
+      });
+
+      updateDebug('Creating points');
+      particles = new THREE.Points(geometry, material);
+      scene.add(particles);
+
+      // Renderer
+      updateDebug('Creating renderer');
+      renderer = new THREE.WebGLRenderer({ 
+        antialias: true, 
+        alpha: true,
+        powerPreference: 'high-performance' 
+      });
+      renderer.setPixelRatio(window.devicePixelRatio);
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.setClearColor(0x050510, 0.3); // Semi-transparent dark background to blend with site colors
+      
+      // Clear any previous instances
+      while (container.firstChild) {
+        container.removeChild(container.firstChild);
+      }
+      
+      try {
+        container.appendChild(renderer.domElement);
+        updateDebug('Renderer added to DOM');
+      } catch (domErr) {
+        updateDebug(`Error appending renderer: ${domErr.message}`);
+      }
+
+      // Event listeners
+      document.addEventListener('pointermove', onPointerMove);
+      window.addEventListener('resize', onWindowResize);
+      window.addEventListener('scroll', onScroll);
+
+      function onWindowResize() {
+        windowHalfX = window.innerWidth / 2;
+        windowHalfY = window.innerHeight / 2;
+
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+
+        renderer.setSize(window.innerWidth, window.innerHeight);
+      }
+
+      function onPointerMove(event) {
+        if (event.isPrimary === false) return;
+
+        mouseX = event.clientX - windowHalfX;
+        mouseY = event.clientY - windowHalfY;
+      }
+      
+      function onScroll() {
+        // Adjust camera position or rotation slightly on scroll
+        const scrollY = window.scrollY;
+        const maxScroll = document.body.scrollHeight - window.innerHeight;
+        const scrollRatio = scrollY / maxScroll;
+        
+        // Gradually tilt the scene as user scrolls
+        scene.rotation.x = scrollRatio * -0.3;
+      }
+
+      function animate() {
+        requestAnimationFrame(animate);
+        render();
+      }
+
+      function render() {
+        // Update time for shaders
+        particles.material.uniforms.time.value = count;
+        
+        // Rotate the scene slightly based on mouse position
+        camera.position.x += (mouseX * 0.5 - camera.position.x) * 0.05;
+        camera.position.y += (-mouseY * 0.5 - camera.position.y + 200) * 0.05;
+        camera.lookAt(scene.position);
+
+        // Update wave animation
+        const positions = particles.geometry.attributes.position.array;
+        const scales = particles.geometry.attributes.scale.array;
+
+        let i = 0, j = 0;
+
+        for (let ix = 0; ix < AMOUNTX; ix++) {
+          for (let iy = 0; iy < AMOUNTY; iy++) {
+            // Update position with dynamic waves
+            positions[i + 1] = (Math.sin((ix + count) * 0.3) * 50) + 
+                              (Math.sin((iy + count) * 0.5) * 50);
+            
+            // Update scale for breathing effect
+            scales[j] = (Math.sin((ix + count) * 0.3) + 1) * 8 + 
+                       (Math.sin((iy + count) * 0.5) + 1) * 8;
+
+            i += 3;
+            j++;
+          }
+        }
+
+        particles.geometry.attributes.position.needsUpdate = true;
+        particles.geometry.attributes.scale.needsUpdate = true;
+
+        renderer.render(scene, camera);
+
+        count += 0.1;
+      }
+
+      // Start animation
+      try {
+        animate();
+        updateDebug('Advanced animation started');
+      } catch (animErr) {
+        updateDebug(`Animation error: ${animErr.message}`);
+      }
+      
+    } catch (err) {
+      console.error('Error initializing Advanced Three.js:', err);
+      updateDebug(`Advanced error: ${err.message}`);
+      throw err; // Re-throw to trigger fallback
+    }
+  }
+
+  // Start loading Three.js and initializing the effect
+  loadThreeJS().then(THREE => {
+    updateDebug('THREE loaded, initializing effect');
+    setTimeout(() => {
+      initDynamicPoints(THREE);
+    }, 300);
+  }).catch(err => {
+    updateDebug(`THREE.js loading error: ${err.message}`);
+    console.error('Error loading Three.js:', err);
+  });
+  
+  // Also handle window load event as a fallback
+  window.addEventListener('load', () => {
+    updateDebug('Window loaded event');
+    if (!document.querySelector('#three-container canvas')) {
+      updateDebug('No canvas found, trying to reinitialize');
+      loadThreeJS().then(THREE => {
+        initDynamicPoints(THREE);
+      }).catch(err => {
+        updateDebug(`Load fallback error: ${err.message}`);
+      });
+    }
+  });
+</script>
+
+<style>
+  #three-container {
+    position: fixed;
+    z-index: -1;
+    pointer-events: none; /* Allow clicking through to content */
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    overflow: hidden;
+  }
+  
+
+</style>

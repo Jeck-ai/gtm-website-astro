@@ -1,0 +1,476 @@
+---
+---
+
+<div id="text-container" class="relative w-full h-[424px] overflow-hidden rounded-lg p-4">
+  <!-- Fallback static text visible initially -->
+  <h2 id="fallback-text" class="absolute text-5xl font-bold text-center w-full top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-indigo-600">
+    GTM Ventures
+  </h2>
+  
+  <!-- Canvas for the animation will replace the fallback text -->
+  <canvas id="animation-canvas" class="w-full h-full hidden"></canvas>
+</div>
+
+<script is:inline>
+  // 3D Structural Text Effect with Connected Nodes
+  window.addEventListener('load', function() {
+    // Get the canvas and context
+    const canvas = document.getElementById('animation-canvas');
+    const fallbackText = document.getElementById('fallback-text');
+    if (!canvas) return;
+    
+    // Make canvas visible, hide fallback
+    canvas.classList.remove('hidden');
+    if (fallbackText) fallbackText.classList.add('hidden');
+    
+    const ctx = canvas.getContext('2d');
+    
+    // Set canvas dimensions
+    const container = canvas.parentElement;
+    canvas.width = container.clientWidth;
+    canvas.height = container.clientHeight;
+    
+    // Text configuration
+    const text = 'GTM Ventures';
+    const fontSize = Math.min(canvas.width / 12, 60);
+    
+    // Center position
+    const centerX = canvas.width / 2;
+    const centerY = canvas.height / 2;
+    
+    // 3D structure configuration
+    const particles = [];
+    const connections = [];
+    const connectionDistance = 30; // Maximum distance for creating connections
+    const particleCount = 800; // Increase for more density
+    const particleDepth = 50; // Z-depth for 3D effect
+    const rotationSpeed = 0.003;
+    
+    // Camera and perspective parameters
+    let cameraZ = 400;
+    let perspective = 800;
+    
+    // Animation state
+    let animationState = 'text'; // 'text', 'exploding', 'rotating', 'reforming'
+    let animationProgress = 0;
+    let currentRotationX = 0;
+    let currentRotationY = 0;
+    let targetRotationX = 0;
+    let targetRotationY = 0;
+    let rotationDirection = 1;
+    
+    // Create a temporary canvas to draw text
+    const tempCanvas = document.createElement('canvas');
+    tempCanvas.width = canvas.width;
+    tempCanvas.height = canvas.height;
+    const tempCtx = tempCanvas.getContext('2d');
+    
+    // Function to extract particles from text
+    function createParticlesFromText() {
+      // Clear temporary canvas
+      tempCtx.clearRect(0, 0, tempCanvas.width, tempCanvas.height);
+      
+      // Set font and draw text centered
+      tempCtx.font = `bold ${fontSize}px Arial, sans-serif`;
+      tempCtx.fillStyle = 'black';
+      tempCtx.textAlign = 'center';
+      tempCtx.textBaseline = 'middle';
+      tempCtx.fillText(text, centerX, centerY);
+      
+      // Get image data to sample points
+      const imageData = tempCtx.getImageData(0, 0, tempCanvas.width, tempCanvas.height);
+      const data = imageData.data;
+      
+      // Sample points from text
+      particles.length = 0; // Clear existing particles
+      
+      // Sample rate (adjust for performance)
+      const sampleRate = 3;
+      
+      for (let y = 0; y < tempCanvas.height; y += sampleRate) {
+        for (let x = 0; x < tempCanvas.width; x += sampleRate) {
+          const index = (y * tempCanvas.width + x) * 4;
+          
+          // If pixel is not transparent (part of text)
+          if (data[index + 3] > 0) {
+            // Create a particle with 3D coordinates
+            const z = (Math.random() - 0.5) * 1; // Very small initial z variation for text state
+            
+            particles.push({
+              // Current position (3D)
+              x: x,
+              y: y,
+              z: z,
+              // Home position (text)
+              homeX: x,
+              homeY: y,
+              homeZ: z,
+              // Explosion position (random sphere around origin)
+              explosionX: (Math.random() - 0.5) * canvas.width * 0.8,
+              explosionY: (Math.random() - 0.5) * canvas.height * 0.8,
+              explosionZ: (Math.random() - 0.5) * particleDepth * 2,
+              // Rendering properties
+              radius: Math.random() * 1.5 + 1,
+              color: getRandomColor(0.8),
+              // Additional properties for 3D effect
+              projectedX: x,
+              projectedY: y,
+              opacity: 1
+            });
+          }
+        }
+      }
+      
+      // If we have too few particles, add some random ones
+      while (particles.length < particleCount) {
+        const x = Math.random() * tempCanvas.width;
+        const y = Math.random() * tempCanvas.height;
+        const z = (Math.random() - 0.5) * 1;
+        
+        particles.push({
+          x: x,
+          y: y,
+          z: z,
+          homeX: x,
+          homeY: y,
+          homeZ: z,
+          explosionX: (Math.random() - 0.5) * canvas.width * 0.8,
+          explosionY: (Math.random() - 0.5) * canvas.height * 0.8,
+          explosionZ: (Math.random() - 0.5) * particleDepth * 2,
+          radius: Math.random() * 1.5 + 1,
+          color: getRandomColor(0.8),
+          projectedX: x,
+          projectedY: y,
+          opacity: 1
+        });
+      }
+      
+      // Create connections between nearby particles (structural graph)
+      createConnections();
+      
+      // Start animation sequence
+      setAnimationState('text');
+      setTimeout(() => setAnimationState('exploding'), 2000);
+    }
+    
+    // Create connections between particles that are close to each other
+    function createConnections() {
+      connections.length = 0;
+      
+      // For performance, limit the maximum number of connections
+      const maxConnections = 2500;
+      let connectionCount = 0;
+      
+      // Create connections based on proximity
+      for (let i = 0; i < particles.length; i++) {
+        const p1 = particles[i];
+        
+        // Each particle will try to connect to nearest neighbors
+        let nearbyParticles = [];
+        
+        for (let j = 0; j < particles.length; j++) {
+          if (i === j) continue;
+          
+          const p2 = particles[j];
+          const dx = p1.homeX - p2.homeX;
+          const dy = p1.homeY - p2.homeY;
+          const dz = p1.homeZ - p2.homeZ;
+          const distance = Math.sqrt(dx*dx + dy*dy + dz*dz);
+          
+          if (distance < connectionDistance) {
+            nearbyParticles.push({
+              index: j,
+              distance: distance
+            });
+          }
+        }
+        
+        // Sort by distance and take closest few
+        nearbyParticles.sort((a, b) => a.distance - b.distance);
+        const connectionsPerParticle = 3; // Each particle connects to its 3 nearest neighbors
+        nearbyParticles = nearbyParticles.slice(0, connectionsPerParticle);
+        
+        // Create connections
+        for (const nearby of nearbyParticles) {
+          // Avoid duplicate connections (i->j and j->i would be the same)
+          if (i < nearby.index) {
+            connections.push({
+              from: i,
+              to: nearby.index,
+              opacity: 0.5, // Initial opacity
+              baseOpacity: 0.2 + Math.random() * 0.3 // Random base opacity for variation
+            });
+            
+            connectionCount++;
+            if (connectionCount >= maxConnections) break;
+          }
+        }
+        
+        if (connectionCount >= maxConnections) break;
+      }
+    }
+    
+    // Helper function to get random color with controlled opacity
+    function getRandomColor(alpha = 1) {
+      // Use a color scheme that looks good together
+      const hues = [210, 220, 230, 190, 200]; // Blues and teals
+      const hue = hues[Math.floor(Math.random() * hues.length)];
+      const saturation = 70 + Math.random() * 30; // High saturation
+      const lightness = 50 + Math.random() * 20; // Medium-high lightness
+      return `hsla(${hue}, ${saturation}%, ${lightness}%, ${alpha})`;
+    }
+    
+    // Set animation state
+    function setAnimationState(state) {
+      animationState = state;
+      animationProgress = 0;
+      
+      if (state === 'exploding') {
+        // Reset rotation for explosion state
+        targetRotationX = 0;
+        targetRotationY = Math.PI * 2 * rotationDirection;
+        rotationDirection *= -1; // Alternate rotation direction
+      }
+      else if (state === 'reforming') {
+        // Reset rotation target for reforming
+        targetRotationX = 0;
+        targetRotationY = 0;
+      }
+    }
+    
+    // Apply 3D rotation to a point
+    function rotate3D(point, rotX, rotY) {
+      // First rotate around Y axis
+      const sinY = Math.sin(rotY);
+      const cosY = Math.cos(rotY);
+      
+      const rotatedX1 = point.x * cosY - point.z * sinY;
+      const rotatedZ1 = point.z * cosY + point.x * sinY;
+      
+      // Then rotate around X axis
+      const sinX = Math.sin(rotX);
+      const cosX = Math.cos(rotX);
+      
+      const rotatedY2 = point.y * cosX - rotatedZ1 * sinX;
+      const rotatedZ2 = rotatedZ1 * cosX + point.y * sinX;
+      
+      return {
+        x: rotatedX1,
+        y: rotatedY2,
+        z: rotatedZ2
+      };
+    }
+    
+    // Project 3D point to 2D screen
+    function projectTo2D(point3D) {
+      // Apply perspective
+      const scale = perspective / (perspective + point3D.z + cameraZ);
+      
+      return {
+        x: centerX + point3D.x * scale,
+        y: centerY + point3D.y * scale,
+        scale: scale
+      };
+    }
+    
+    // Animation function
+    function animate() {
+      // Clear canvas
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      
+      // Background gradient
+      const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+      gradient.addColorStop(0, '#111827'); // Dark blue-gray
+      gradient.addColorStop(1, '#1E293B'); // Slightly lighter blue-gray
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      
+      // Update animation progress
+      const progressSpeed = (animationState === 'exploding') ? 0.01 : 
+                          (animationState === 'rotating') ? 0.005 : 0.02;
+      
+      animationProgress += progressSpeed;
+      
+      if (animationProgress >= 1) {
+        animationProgress = 1;
+        
+        // Transition to next state
+        if (animationState === 'exploding') {
+          setAnimationState('rotating');
+        } 
+        else if (animationState === 'rotating') {
+          setTimeout(() => setAnimationState('reforming'), 5000);
+        }
+        else if (animationState === 'reforming') {
+          setTimeout(() => {
+            // Refresh colors
+            particles.forEach(p => {
+              p.color = getRandomColor(0.8);
+            });
+            connections.forEach(c => {
+              c.baseOpacity = 0.2 + Math.random() * 0.3;
+            });
+            
+            setAnimationState('exploding');
+          }, 3000);
+        }
+      }
+      
+      // Update rotation
+      if (animationState === 'rotating') {
+        currentRotationX += rotationSpeed * Math.sin(Date.now() * 0.0005);
+        currentRotationY += rotationSpeed;
+      } else {
+        // Smoothly interpolate to target rotation
+        currentRotationX += (targetRotationX - currentRotationX) * 0.05;
+        currentRotationY += (targetRotationY - currentRotationY) * 0.05;
+      }
+      
+      // Update particle positions based on animation state
+      particles.forEach(p => {
+        // Set 3D position based on animation state
+        if (animationState === 'text') {
+          p.x = p.homeX;
+          p.y = p.homeY;
+          p.z = p.homeZ;
+        } 
+        else if (animationState === 'exploding') {
+          p.x = p.homeX + (p.explosionX - p.homeX) * animationProgress;
+          p.y = p.homeY + (p.explosionY - p.homeY) * animationProgress;
+          p.z = p.homeZ + (p.explosionZ - p.homeZ) * animationProgress;
+        }
+        else if (animationState === 'rotating') {
+          // Keep the exploded state during rotation
+          p.x = p.explosionX;
+          p.y = p.explosionY;
+          p.z = p.explosionZ;
+        }
+        else if (animationState === 'reforming') {
+          p.x = p.explosionX + (p.homeX - p.explosionX) * animationProgress;
+          p.y = p.explosionY + (p.homeY - p.explosionY) * animationProgress;
+          p.z = p.explosionZ + (p.homeZ - p.explosionZ) * animationProgress;
+        }
+        
+        // Apply 3D rotation
+        const rotated = rotate3D(p, currentRotationX, currentRotationY);
+        
+        // Project to 2D
+        const projected = projectTo2D(rotated);
+        
+        // Store projected coordinates for drawing connections
+        p.projectedX = projected.x;
+        p.projectedY = projected.y;
+        
+        // Adjust opacity based on z-position (depth)
+        p.opacity = 0.4 + 0.6 * (1 - (rotated.z + particleDepth) / (particleDepth * 2));
+        
+        // Adjust radius based on perspective scaling
+        const displayRadius = p.radius * projected.scale;
+        
+        // Draw particle
+        ctx.beginPath();
+        ctx.arc(projected.x, projected.y, displayRadius, 0, Math.PI * 2);
+        
+        // Use the particle's color with its current opacity
+        const color = p.color.replace(/[\d.]+\)$/, `${p.opacity})`);
+        ctx.fillStyle = color;
+        ctx.fill();
+      });
+      
+      // Draw connections between particles
+      connections.forEach(conn => {
+        const p1 = particles[conn.from];
+        const p2 = particles[conn.to];
+        
+        // Calculate opacity based on average opacity of connected particles and distance
+        const averageOpacity = (p1.opacity + p2.opacity) / 2 * conn.baseOpacity;
+        
+        // Calculate distance in 3D space after rotation
+        const dx = p1.projectedX - p2.projectedX;
+        const dy = p1.projectedY - p2.projectedY;
+        const distance = Math.sqrt(dx*dx + dy*dy);
+        
+        // Skip connections that are too far apart in projected space
+        if (distance > connectionDistance * 3) return;
+        
+        // Draw connection
+        ctx.beginPath();
+        ctx.moveTo(p1.projectedX, p1.projectedY);
+        ctx.lineTo(p2.projectedX, p2.projectedY);
+        ctx.strokeStyle = `rgba(100, 180, 255, ${averageOpacity})`;
+        
+        // Adjust line width based on perspective
+        const averageScale = ((p1.opacity + p2.opacity) / 2) * 0.5;
+        ctx.lineWidth = averageScale;
+        
+        ctx.stroke();
+      });
+      
+      // Continue animation
+      requestAnimationFrame(animate);
+    }
+    
+    // Handle window resize
+    window.addEventListener('resize', function() {
+      canvas.width = container.clientWidth;
+      canvas.height = container.clientHeight;
+      
+      // Update center position
+      const newCenterX = canvas.width / 2;
+      const newCenterY = canvas.height / 2;
+      
+      // Update center
+      centerX = newCenterX;
+      centerY = newCenterY;
+      
+      createParticlesFromText(); // Recreate particles for new size
+    });
+    
+    // Handle mouse/touch movement for interactive rotation
+    let isDragging = false;
+    let lastMouseX = 0;
+    let lastMouseY = 0;
+    
+    canvas.addEventListener('mousedown', handleDragStart);
+    canvas.addEventListener('touchstart', e => {
+      const touch = e.touches[0];
+      handleDragStart({ clientX: touch.clientX, clientY: touch.clientY });
+    });
+    
+    window.addEventListener('mousemove', handleDragMove);
+    window.addEventListener('touchmove', e => {
+      const touch = e.touches[0];
+      handleDragMove({ clientX: touch.clientX, clientY: touch.clientY });
+    });
+    
+    window.addEventListener('mouseup', handleDragEnd);
+    window.addEventListener('touchend', handleDragEnd);
+    
+    function handleDragStart(e) {
+      isDragging = true;
+      lastMouseX = e.clientX;
+      lastMouseY = e.clientY;
+    }
+    
+    function handleDragMove(e) {
+      if (!isDragging || animationState !== 'rotating') return;
+      
+      const deltaX = e.clientX - lastMouseX;
+      const deltaY = e.clientY - lastMouseY;
+      
+      currentRotationY += deltaX * 0.01;
+      currentRotationX += deltaY * 0.01;
+      
+      lastMouseX = e.clientX;
+      lastMouseY = e.clientY;
+    }
+    
+    function handleDragEnd() {
+      isDragging = false;
+    }
+    
+    // Start the animation
+    createParticlesFromText();
+    animate();
+  });
+</script>

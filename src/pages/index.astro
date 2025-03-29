@@ -4,14 +4,76 @@ import Cta from "@/components/cta.astro";
 import Features from "@/components/features.astro";
 import Hero from "@/components/hero.astro";
 import Logos from "@/components/logos.astro";
+import DynamicPoints from "@/components/three/DynamicPoints.astro";
+import BasicTest from "@/components/three/BasicTest.astro";
 import Layout from "@/layouts/Layout.astro";
 ---
 
-<Layout title="">
+<Layout title="GTM Ventures - Consultant for Digital Strategy">
+  <BasicTest />
+  <DynamicPoints />
   <Container>
     <Hero />
     <Features />
     <Logos />
     <Cta />
   </Container>
+
+  <style>
+    /* Add dark background for Three.js scene */
+    :global(body) {
+      background-color: #050510; /* Darker background for better effect */
+      color: white;
+      overflow-x: hidden;
+    }
+    
+    /* Add subtle gradient overlay */
+    :global(body::before) {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle at 50% 50%, rgba(5, 5, 16, 0.4) 0%, rgba(5, 5, 16, 0.8) 100%);
+      pointer-events: none;
+      z-index: -5;
+    }
+    
+    /* Adjust contrast for better text readability */
+    :global(.text-slate-600) {
+      color: #cbd5e1 !important; /* Lighter color for better contrast */
+    }
+    
+    /* Make navbar semi-transparent with blur */
+    :global(nav) {
+      background-color: rgba(5, 5, 16, 0.7) !important;
+      backdrop-filter: blur(10px);
+    }
+    
+    /* Add glow to hero text */
+    :global(h1) {
+      text-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
+    }
+    
+    /* Adjust outline button to have better contrast */
+    :global([style="outline"]) {
+      color: white !important;
+      border-color: rgba(255, 255, 255, 0.5) !important;
+    }
+    
+    :global([style="outline"]:hover) {
+      border-color: white !important;
+      box-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
+    }
+    
+    :global([style="outline"] .text-black) {
+      color: white !important;
+    }
+    
+    /* Add subtle transitions */
+    :global(a, button) {
+      transition: all 0.3s ease;
+    }
+  </style>
 </Layout>

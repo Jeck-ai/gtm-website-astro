@@ -1,0 +1,59 @@
+---
+---
+
+<div id="canvas-container" class="relative w-full h-[424px] overflow-hidden rounded-lg bg-gray-100">
+  <h2 id="loading-text" class="absolute text-5xl font-bold text-center w-full top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-indigo-600">
+    Loading Canvas Test...
+  </h2>
+  <canvas id="basic-canvas" class="w-full h-full" width="300" height="200"></canvas>
+</div>
+
+<script>
+  // This script is purposely NOT using is:inline as a different approach
+  const drawCanvas = () => {
+    const canvas = document.getElementById('basic-canvas');
+    const loadingText = document.getElementById('loading-text');
+    
+    if (!canvas) {
+      console.error('Canvas not found');
+      return;
+    }
+    
+    try {
+      // Hide loading text
+      if (loadingText) loadingText.style.display = 'none';
+      
+      const ctx = canvas.getContext('2d');
+      
+      // Set canvas size
+      const container = canvas.parentElement;
+      canvas.width = container.clientWidth;
+      canvas.height = container.clientHeight;
+      
+      // Clear canvas
+      ctx.fillStyle = '#f0f0f0';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      
+      // Draw a simple shape
+      ctx.fillStyle = '#4F46E5';
+      ctx.beginPath();
+      ctx.arc(canvas.width/2, canvas.height/2, 50, 0, Math.PI * 2);
+      ctx.fill();
+      
+      // Add text
+      ctx.fillStyle = 'white';
+      ctx.font = '20px Arial';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('Canvas Works!', canvas.width/2, canvas.height/2);
+    } catch (error) {
+      console.error('Error drawing canvas:', error);
+    }
+  };
+  
+  // Wait for DOM to be ready
+  document.addEventListener('DOMContentLoaded', drawCanvas);
+  
+  // Also try on window load (sometimes needed for sizing)
+  window.addEventListener('load', drawCanvas);
+</script>

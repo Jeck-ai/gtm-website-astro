@@ -1,0 +1,207 @@
+---
+---
+
+<div id="text-container" class="relative w-full h-[424px] overflow-hidden bg-gradient-to-r from-blue-100 to-indigo-100 rounded-lg p-4">
+  <!-- Fallback static text visible initially -->
+  <h2 id="fallback-text" class="absolute text-5xl font-bold text-center w-full top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-indigo-600">
+    GTM Ventures
+  </h2>
+  
+  <!-- Canvas for the animation will replace the fallback text -->
+  <canvas id="animation-canvas" class="w-full h-full hidden"></canvas>
+</div>
+
+<script is:inline>
+  // Simple text animation with canvas
+  window.addEventListener('load', function() {
+    // Get the canvas and context
+    const canvas = document.getElementById('animation-canvas');
+    const fallbackText = document.getElementById('fallback-text');
+    if (!canvas) return;
+    
+    // Make canvas visible, hide fallback
+    canvas.classList.remove('hidden');
+    if (fallbackText) fallbackText.classList.add('hidden');
+    
+    const ctx = canvas.getContext('2d');
+    
+    // Set canvas dimensions
+    const container = canvas.parentElement;
+    canvas.width = container.clientWidth;
+    canvas.height = container.clientHeight;
+    
+    // Text configuration
+    const text = 'GTM Ventures';
+    const fontSize = Math.min(canvas.width / 12, 60);
+    ctx.font = `bold ${fontSize}px Arial, sans-serif`;
+    
+    // Center position
+    const centerX = canvas.width / 2;
+    const centerY = canvas.height / 2;
+    
+    // Particle setup
+    const particles = [];
+    const particleCount = 500;
+    
+    // Create a temporary canvas to draw text
+    const tempCanvas = document.createElement('canvas');
+    tempCanvas.width = canvas.width;
+    tempCanvas.height = canvas.height;
+    const tempCtx = tempCanvas.getContext('2d');
+    
+    // Function to extract particles from text
+    function createParticlesFromText() {
+      // Clear temporary canvas
+      tempCtx.clearRect(0, 0, tempCanvas.width, tempCanvas.height);
+      
+      // Set font and draw text centered
+      tempCtx.font = ctx.font;
+      tempCtx.fillStyle = 'black';
+      tempCtx.textAlign = 'center';
+      tempCtx.textBaseline = 'middle';
+      tempCtx.fillText(text, centerX, centerY);
+      
+      // Get image data to sample points
+      const imageData = tempCtx.getImageData(0, 0, tempCanvas.width, tempCanvas.height);
+      const data = imageData.data;
+      
+      // Sample points from text
+      particles.length = 0; // Clear existing particles
+      
+      // Sample rate (adjust for performance)
+      const sampleRate = 4;
+      
+      for (let y = 0; y < tempCanvas.height; y += sampleRate) {
+        for (let x = 0; x < tempCanvas.width; x += sampleRate) {
+          const index = (y * tempCanvas.width + x) * 4;
+          
+          // If pixel is not transparent (part of text)
+          if (data[index + 3] > 0) {
+            // Create a particle
+            particles.push({
+              x: x,
+              y: y,
+              // Store the home position
+              homeX: x,
+              homeY: y,
+              // Random position for explosion effect
+              explosionX: x + (Math.random() - 0.5) * tempCanvas.width * 0.8,
+              explosionY: y + (Math.random() - 0.5) * tempCanvas.height * 0.8,
+              // Random radius and color
+              radius: Math.random() * 2 + 1,
+              color: getRandomColor(),
+              // Animation state
+              state: 'text', // 'text', 'exploding', or 'reforming'
+              progress: 0 // Animation progress 0-1
+            });
+          }
+        }
+      }
+      
+      // If we have too few particles, add some random ones
+      while (particles.length < particleCount) {
+        particles.push({
+          x: Math.random() * tempCanvas.width,
+          y: Math.random() * tempCanvas.height,
+          homeX: Math.random() * tempCanvas.width, 
+          homeY: Math.random() * tempCanvas.height,
+          explosionX: Math.random() * tempCanvas.width,
+          explosionY: Math.random() * tempCanvas.height,
+          radius: Math.random() * 2 + 1,
+          color: getRandomColor(),
+          state: 'text',
+          progress: 0
+        });
+      }
+      
+      // Start animation
+      setState('text');
+      setTimeout(() => setState('exploding'), 3000); // Start explosion after 3 seconds
+    }
+    
+    // Helper function to get random color with good saturation
+    function getRandomColor() {
+      const hue = Math.random() * 360;
+      return `hsl(${hue}, 80%, 60%)`;
+    }
+    
+    // Set animation state for all particles
+    function setState(state) {
+      particles.forEach(p => {
+        p.state = state;
+        p.progress = 0;
+      });
+    }
+    
+    // Animation function
+    function animate() {
+      // Clear canvas
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      
+      // Draw and update particles
+      let allCompleted = true;
+      
+      particles.forEach(p => {
+        // Update particle position based on state
+        if (p.state === 'exploding') {
+          p.progress += 0.01;
+          if (p.progress >= 1) {
+            p.progress = 1;
+          } else {
+            allCompleted = false;
+          }
+          
+          p.x = p.homeX + (p.explosionX - p.homeX) * p.progress;
+          p.y = p.homeY + (p.explosionY - p.homeY) * p.progress;
+        } 
+        else if (p.state === 'reforming') {
+          p.progress += 0.02;
+          if (p.progress >= 1) {
+            p.progress = 1;
+          } else {
+            allCompleted = false;
+          }
+          
+          p.x = p.explosionX + (p.homeX - p.explosionX) * p.progress;
+          p.y = p.explosionY + (p.homeY - p.explosionY) * p.progress;
+        }
+        
+        // Draw particle
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+        ctx.fillStyle = p.color;
+        ctx.fill();
+      });
+      
+      // Transition to next state if all particles completed current animation
+      if (allCompleted) {
+        if (particles[0].state === 'exploding') {
+          setTimeout(() => setState('reforming'), 500);
+        } 
+        else if (particles[0].state === 'reforming') {
+          // Add randomness by changing explosion destinations
+          particles.forEach(p => {
+            p.explosionX = p.homeX + (Math.random() - 0.5) * tempCanvas.width * 0.8;
+            p.explosionY = p.homeY + (Math.random() - 0.5) * tempCanvas.height * 0.8;
+            p.color = getRandomColor(); // Change color each cycle
+          });
+          setTimeout(() => setState('exploding'), 3000);
+        }
+      }
+      
+      // Continue animation
+      requestAnimationFrame(animate);
+    }
+    
+    // Handle window resize
+    window.addEventListener('resize', function() {
+      canvas.width = container.clientWidth;
+      canvas.height = container.clientHeight;
+      createParticlesFromText(); // Recreate particles for new size
+    });
+    
+    // Start the animation
+    createParticlesFromText();
+    animate();
+  });
+</script>

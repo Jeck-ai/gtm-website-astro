@@ -4,22 +4,27 @@ import Link from "@/components/ui/link.astro";
 import Dropdown from "./dropdown.astro";
 import { Astronav, MenuItems, MenuIcon } from "astro-navbar";
 
+// Ensure BASE_URL ends with a slash
+const baseUrl = import.meta.env.BASE_URL.endsWith('/') 
+  ? import.meta.env.BASE_URL 
+  : import.meta.env.BASE_URL + '/';
+
 const menuitems = [
   {
     title: "About",
-    path: import.meta.env.BASE_URL + "about",
+    path: baseUrl + "about",
   },
   {
     title: "Services",
-    path: import.meta.env.BASE_URL + "services",
+    path: baseUrl + "services",
   },
   {
     title: "Blog",
-    path: import.meta.env.BASE_URL + "blog",
+    path: baseUrl + "blog",
   },
   {
     title: "Contact",
-    path: import.meta.env.BASE_URL + "contact",
+    path: baseUrl + "contact",
   },
 ];
 ---
@@ -28,7 +33,7 @@ const menuitems = [
   <header class="flex flex-col lg:flex-row justify-between items-center my-5">
     <Astronav>
       <div class="flex w-full lg:w-auto items-center justify-between">
-        <a href={import.meta.env.BASE_URL} class="text-lg"
+        <a href={baseUrl} class="text-lg"
           ><span class="font-bold text-slate-800">GTM</span><span
             class="text-slate-500">Ventures</span
           >

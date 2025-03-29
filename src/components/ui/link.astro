@@ -17,12 +17,17 @@ const {
   ...rest
 } = Astro.props;
 
+// Ensure BASE_URL ends with a slash
+const baseUrl = import.meta.env.BASE_URL.endsWith('/') 
+  ? import.meta.env.BASE_URL 
+  : import.meta.env.BASE_URL + '/';
+
 // Handle external links (starting with http:// or https://) differently
 const finalHref = href.startsWith('http://') || href.startsWith('https://') 
   ? href 
   : href.startsWith('/') 
-    ? import.meta.env.BASE_URL + href.substring(1) 
-    : import.meta.env.BASE_URL + href;
+    ? baseUrl + href.substring(1) 
+    : baseUrl + href;
 
 const sizes = {
   lg: "px-5 py-2.5",

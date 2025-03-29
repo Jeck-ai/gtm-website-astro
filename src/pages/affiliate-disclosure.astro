@@ -1,0 +1,49 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Container from "@/components/container.astro";
+import Sectionhead from "@/components/sectionhead.astro";
+---
+
+<Layout title="Affiliate Disclosure">
+  <Container>
+    <Sectionhead>
+      <Fragment slot="title">Affiliate Disclosure</Fragment>
+      <Fragment slot="desc">
+        Transparency about our affiliate relationships
+      </Fragment>
+    </Sectionhead>
+
+    <div class="mx-auto max-w-3xl mt-12 prose prose-lg">
+      <h2>Affiliate Program Participation</h2>
+      <p>
+        GTM Ventures participates in various affiliate programs, including but not limited to PartnerStack and Impact.com. This means that when you click on certain links on our website and make a purchase, we may receive a commission or other compensation.
+      </p>
+
+      <h2>How Affiliate Links Work</h2>
+      <p>
+        When you click on an affiliate link on our website, a small piece of code tracks this action and attributes any resulting purchase to our account. This allows the merchant to know that we referred you to their website and to pay us a percentage of what you purchase.
+      </p>
+
+      <h2>Our Commitment to You</h2>
+      <p>
+        We want to be completely transparent about our use of affiliate links:
+      </p>
+      <ul>
+        <li>We only recommend products and services that we believe in and would use ourselves.</li>
+        <li>Our reviews and opinions are never influenced by affiliate relationships.</li>
+        <li>We will always disclose when a link is an affiliate link.</li>
+        <li>You will never pay more for a product by using our affiliate links.</li>
+      </ul>
+
+      <h2>Revenue Sharing</h2>
+      <p>
+        The commissions we earn through affiliate programs help support the content we create and the services we provide. These commissions do not affect the price you pay for products or services.
+      </p>
+
+      <h2>Questions?</h2>
+      <p>
+        If you have any questions about our affiliate relationships or how we use affiliate links, please don't hesitate to <a href="/contact">contact us</a>.
+      </p>
+    </div>
+  </Container>
+</Layout>

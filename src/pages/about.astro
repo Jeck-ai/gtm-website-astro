@@ -1,57 +1,93 @@
 ---
-import { getCollection } from "astro:content";
-import { Picture } from "astro:assets";
 import Layout from "@/layouts/Layout.astro";
 import Container from "@/components/container.astro";
 import Sectionhead from "@/components/sectionhead.astro";
-
-// Filter team entries with 'draft: false' & date before current date
-const publishedTeamMembers = await getCollection("team", ({ data }) => {
-  return !data.draft && data.publishDate < new Date();
-});
+import { Picture } from "astro:assets";
+import Link from "@/components/ui/link.astro";
 ---
 
 <Layout title="About">
   <Container>
     <Sectionhead>
-      <Fragment slot="title">About</Fragment>
-      <Fragment slot="desc">We are a small passionate team.</Fragment>
+      <Fragment slot="title">About Me</Fragment>
+      <Fragment slot="desc">Startup Executive & AI Strategy Consultant</Fragment>
     </Sectionhead>
 
     <div class="flex flex-col gap-3 mx-auto max-w-4xl mt-16">
       <h2 class="font-bold text-3xl text-gray-800">
-        Empowering the world with Astro.
+        Building and scaling successful software companies for over 20 years
       </h2>
       <p class="text-lg leading-relaxed text-slate-500">
-        We're a multi-cultural team from around the world! We come from diverse
-        backgrounds, bringing different personalities, experiences and skills to
-        the job. This is what makes our team so special.
+        I'm a software startup executive with over two decades of experience funding and growing companies from seed to scale-up. My focus areas include Product-Market Fit, Go To Market strategy, Agentic AI implementation, and Model Context Protocol development.
       </p>
     </div>
-    <div class="grid md:grid-cols-3 gap-10 mx-auto max-w-4xl mt-12">
-      {
-        publishedTeamMembers.map((teamMemberEntry) => (
-          <div class="group">
-            <div class="w-full aspect-square">
-              <Picture
-                src={teamMemberEntry.data.avatar.src}
-                alt={teamMemberEntry.data.avatar.alt}
-                sizes="(max-width: 800px) 100vw, 400px"
-                width={400}
-                height={400}
-                class="w-full rounded-sm transition group-hover:-translate-y-1 group-hover:shadow-xl bg-white object-cover object-center aspect-square"
-              />
-            </div>
 
-            <div class="mt-4 text-center">
-              <h2 class="text-lg text-gray-800">{teamMemberEntry.data.name}</h2>
-              <h3 class="text-sm text-slate-500">
-                {teamMemberEntry.data.title}
-              </h3>
-            </div>
-          </div>
-        ))
-      }
+    <div class="grid md:grid-cols-2 gap-10 mx-auto max-w-4xl mt-12">
+      <div>
+        <h3 class="text-2xl font-semibold mb-4">Professional Background</h3>
+        <p class="text-lg text-slate-600 mb-6">
+          I've built and led teams in Customer Success, Presales, Sales Engineering, and Developer Relations at companies like Platform.sh, Commerce Guys, and Acquia. My experience spans CMS, E-commerce, PaaS, SaaS, and Decentralization technologies.
+        </p>
+        <p class="text-lg text-slate-600 mb-6">
+          I'm particularly passionate about developing innovative software solutions addressing the climate crisis, having recently completed the prestigious 5-month Rockstart AgriFood accelerator program and secured institutional funding for startups in this space.
+        </p>
+        <h3 class="text-2xl font-semibold mb-4">Expertise & Notable Projects</h3>
+        <ul class="list-disc list-inside text-lg text-slate-600 space-y-2 mb-6">
+          <li>Led Platform.sh's M&A acquisition of key technology</li>
+          <li>Developed RAG-enhanced AI and data collection prototypes</li>
+          <li>Built Model Context Protocol servers in Python and GoLang</li>
+          <li>Created the Open Goldberg Variations project</li>
+          <li>Sun Certified Java Developer</li>
+          <li>Member of Model Context Protocol Hosting Working Group</li>
+        </ul>
+      </div>
+      <div class="flex flex-col items-center justify-center">
+        <div class="w-64 h-64 rounded-full overflow-hidden mb-6 border-4 border-gray-200">
+          <!-- Replace with actual profile image -->
+          <img 
+            src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=774&q=80" 
+            alt="Robert Douglass" 
+            class="w-full h-full object-cover"
+          />
+        </div>
+        <h3 class="text-2xl font-bold text-center">Robert Douglass</h3>
+        <p class="text-lg text-slate-600 text-center mb-6">Founder & Principal Consultant</p>
+        <Link href="/contact" size="md">Get in Touch</Link>
+      </div>
+    </div>
+
+    <div class="mx-auto max-w-4xl mt-16">
+      <h3 class="text-2xl font-semibold mb-6 text-center">Featured Workshop Offerings</h3>
+      <div class="grid md:grid-cols-2 gap-8">
+        <div class="bg-gray-50 p-6 rounded-lg border border-gray-100">
+          <h4 class="font-bold text-xl mb-3">Product Positioning Workshop</h4>
+          <p class="text-slate-600 mb-4">
+            A hands-on workshop that helps your team develop clear, compelling positioning for your product or service. We'll define your unique value proposition, target audience segments, and messaging framework.
+          </p>
+          <p class="text-sm text-slate-500">Duration: Full-day (6 hours) or Half-day (3 hours)</p>
+        </div>
+        <div class="bg-gray-50 p-6 rounded-lg border border-gray-100">
+          <h4 class="font-bold text-xl mb-3">Company Values & Mission Workshop</h4>
+          <p class="text-slate-600 mb-4">
+            Establish or refine your company's core values and mission. This interactive workshop helps leadership teams articulate and align on foundational principles that guide decision-making and culture.
+          </p>
+          <p class="text-sm text-slate-500">Duration: Full-day (6 hours)</p>
+        </div>
+        <div class="bg-gray-50 p-6 rounded-lg border border-gray-100">
+          <h4 class="font-bold text-xl mb-3">Tone & Voice Workshop</h4>
+          <p class="text-slate-600 mb-4">
+            Develop a distinctive and consistent brand voice across all communications. Perfect for marketing teams and content creators who need to establish guidelines for how your brand speaks.
+          </p>
+          <p class="text-sm text-slate-500">Duration: Half-day (3 hours)</p>
+        </div>
+        <div class="bg-gray-50 p-6 rounded-lg border border-gray-100">
+          <h4 class="font-bold text-xl mb-3">AI Strategy & Implementation Workshop</h4>
+          <p class="text-slate-600 mb-4">
+            Learn how to effectively implement agentic AI and Model Context Protocol in your products and services. Includes practical guidance for technical teams on implementation approaches.
+          </p>
+          <p class="text-sm text-slate-500">Duration: Two half-days (6 hours total)</p>
+        </div>
+      </div>
     </div>
   </Container>
 </Layout>

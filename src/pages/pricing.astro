@@ -6,58 +6,58 @@ import PricingCard from "@/components/pricing.astro";
 
 const pricing = [
   {
-    name: "Personal",
-    price: "Free",
+    name: "Advisory Consulting",
+    price: "From €250/hr",
     popular: false,
     features: [
-      "Lifetime free",
-      "Up to 3 users",
-      "Unlimited Pages",
-      "Astro Sub domain",
-      "Basic Integrations",
-      "Community Support",
+      "Product-Market Fit Assessment",
+      "Go To Market Strategy",
+      "AI Implementation Planning",
+      "Executive Mentoring",
+      "Flexible Engagement Format",
+      "Virtual or On-site Options",
     ],
     button: {
-      text: "Get Started",
-      link: "/",
+      text: "Schedule a Call",
+      link: "/contact",
     },
   },
   {
-    name: "Startup",
+    name: "Workshops",
     price: {
-      monthly: "$19",
-      annual: "$16",
-      discount: "10%",
-      original: "$24",
+      monthly: "From €1,995",
+      annual: "€1,995",
+      discount: "",
+      original: "",
     },
     popular: true,
     features: [
-      "All Free Features",
-      "Up to 20 users",
-      "20 Custom domains",
-      "Unlimited Collaborators",
-      "Advanced Integrations",
-      "Priority Support",
+      "Product Positioning",
+      "Tone & Voice Development",
+      "Company Values & Mission",
+      "AI Implementation",
+      "Customized Content",
+      "Interactive Exercises",
     ],
     button: {
-      text: "Get Started",
-      link: "#",
+      text: "Get Workshop Details",
+      link: "/contact",
     },
   },
   {
-    name: "Enterprise",
+    name: "Retained Advisory",
     price: "Custom",
     popular: false,
     features: [
-      "All Pro Features",
-      "Unlimited Custom domains",
-      "99.99% Uptime SLA",
-      "SAML & SSO Integration",
-      "Dedicated Account Manager",
-      "24/7 Phone Support",
+      "Regular Strategy Sessions",
+      "Fractional Executive Role",
+      "On-call Availability",
+      "Investment Preparation",
+      "Accelerator Readiness",
+      "Long-term Partnership",
     ],
     button: {
-      text: "Contact us",
+      text: "Contact for Details",
       link: "/contact",
     },
   },
@@ -67,15 +67,50 @@ const pricing = [
 <Layout title="Pricing">
   <Container>
     <Sectionhead>
-      <Fragment slot="title">Pricing</Fragment>
+      <Fragment slot="title">Engagement Options</Fragment>
       <Fragment slot="desc">
-        Simple & Predictable pricing. No Surprises.
+        Flexible consulting formats tailored to your specific needs
       </Fragment>
     </Sectionhead>
 
     <div
       class="grid md:grid-cols-3 gap-10 mx-auto max-w-(--breakpoint-lg) mt-12">
       {pricing.map((item) => <PricingCard plan={item} />)}
+    </div>
+
+    <div class="mx-auto max-w-4xl mt-20">
+      <h2 class="text-3xl font-bold text-center mb-8">Customized Engagement Approach</h2>
+      
+      <div class="grid md:grid-cols-2 gap-8">
+        <div class="bg-gray-50 p-6 rounded-lg border border-gray-100">
+          <h3 class="text-xl font-bold mb-4">Short-Term Projects</h3>
+          <p class="text-gray-600 mb-4">
+            For specific challenges with defined scopes, I offer focused engagements with clear deliverables. These typically include strategy development, team workshops, or targeted technical implementation guidance.
+          </p>
+          <p class="text-gray-600">
+            <strong>Timeframe:</strong> 2-6 weeks
+          </p>
+        </div>
+        
+        <div class="bg-gray-50 p-6 rounded-lg border border-gray-100">
+          <h3 class="text-xl font-bold mb-4">Long-Term Partnerships</h3>
+          <p class="text-gray-600 mb-4">
+            For ongoing strategic guidance, I offer retainer-based relationships where I serve as a trusted advisor to your leadership team. This includes regular strategy sessions, on-call availability, and consistent support.
+          </p>
+          <p class="text-gray-600">
+            <strong>Timeframe:</strong> 3-12 months
+          </p>
+        </div>
+      </div>
+      
+      <div class="mt-12 text-center">
+        <p class="text-lg text-gray-600 max-w-2xl mx-auto mb-6">
+          All engagements begin with a comprehensive discovery session to understand your specific challenges, goals, and context. This ensures that every recommendation and strategy is tailored to your unique situation.
+        </p>
+        <a href="/contact" class="bg-black text-white px-8 py-3 rounded-md font-medium hover:bg-gray-800 transition-colors">
+          Start a Conversation
+        </a>
+      </div>
     </div>
   </Container>
 </Layout>

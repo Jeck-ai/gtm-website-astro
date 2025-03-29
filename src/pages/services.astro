@@ -1,0 +1,75 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Container from "@/components/container.astro";
+import Sectionhead from "@/components/sectionhead.astro";
+import Link from "@/components/ui/link.astro";
+import { Icon } from "astro-icon/components";
+
+const services = [
+  {
+    title: "Strategic Consulting",
+    description: "Deep expertise in product-market fit, go-to-market strategy, content management, and e-commerce solutions. I help you pinpoint your value proposition and develop compelling narratives for investors and customers.",
+    icon: "bx:bxs-briefcase",
+  },
+  {
+    title: "AI Implementation & Strategy",
+    description: "Expert guidance on implementing agentic AI and Model Context Protocol solutions. I've developed production MCP servers in Python and GoLang and can help your business leverage AI effectively.",
+    icon: "bx:bxs-brain",
+  },
+  {
+    title: "Workshops & Team Development",
+    description: "Specialized workshops in Product Positioning, Tone & Voice, Company Values and Mission, and technical implementations. Drawing from experience building and leading teams in Customer Success, DevRel, and Presales.",
+    icon: "bx:bxs-group",
+  },
+  {
+    title: "Startup Acceleration",
+    description: "Having been through two accelerator programs and leading startups from seed to scale-up, I provide mentorship and hands-on guidance for navigating crucial growth phases.",
+    icon: "bx:bxs-rocket",
+  },
+  {
+    title: "Platform as a Service Optimization",
+    description: "Expert advice on PaaS implementation, optimization, and migration strategies, drawing from my experience as VP of Channel Development at Platform.sh.",
+    icon: "bx:bxs-cloud",
+  },
+  {
+    title: "Developer Relations & Community Building",
+    description: "Build thriving technical communities and effective developer relations programs based on my experience as Chief DevRel Officer and contributions to open source communities.",
+    icon: "bx:bxs-network-chart",
+  },
+];
+---
+
+<Layout title="Services">
+  <Container>
+    <Sectionhead>
+      <Fragment slot="title">Services</Fragment>
+      <Fragment slot="desc">
+        Strategic expertise for startup founders, product leaders, and technical executives
+      </Fragment>
+    </Sectionhead>
+
+    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-10 mx-auto max-w-6xl mt-12">
+      {
+        services.map((item) => (
+          <div class="flex flex-col items-center border border-gray-200 rounded-lg p-6 shadow-sm">
+            <div class="bg-black p-3 rounded-full w-12 h-12 flex items-center justify-center mb-4">
+              <Icon class="text-white w-6 h-6" name={item.icon} />
+            </div>
+            <h3 class="text-xl font-bold text-center">{item.title}</h3>
+            <p class="text-slate-600 mt-4 text-center">{item.description}</p>
+          </div>
+        ))
+      }
+    </div>
+
+    <div class="mt-16 text-center">
+      <h2 class="text-3xl font-bold mb-6">Ready to accelerate your product strategy?</h2>
+      <p class="text-lg text-slate-600 max-w-2xl mx-auto mb-8">
+        With 20+ years of experience building and scaling successful software companies, I offer bespoke consulting and workshops tailored to your specific challenges. Pricing is customized based on engagement scope and timeline.
+      </p>
+      <Link href="/contact" size="lg">
+        Schedule a Strategy Call
+      </Link>
+    </div>
+  </Container>
+</Layout>

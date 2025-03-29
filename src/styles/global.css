@@ -4,9 +4,16 @@
 
 @theme {
   --font-sans:
-    Bricolage Grotesque Variable, Inter Variable, Inter, ui-sans-serif,
+    "Atkinson Hyperlegible", ui-sans-serif,
     system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
     'Segoe UI Symbol', 'Noto Color Emoji';
+}
+
+/* Add letter spacing for Atkinson Hyperlegible font */
+@layer base {
+  html {
+    letter-spacing: 0.025em; /* Increased from 0.02em for better readability */
+  }
 }
 
 /*

@@ -34,22 +34,6 @@ export function createRenderer(width, height, alpha = true) {
   return renderer;
 }
 
-// Standard scene setup with lighting
-export function createSceneWithLighting() {
-  const scene = new THREE.Scene();
-  
-  // Add ambient light
-  const ambientLight = new THREE.AmbientLight(0x404040, 2);
-  scene.add(ambientLight);
-  
-  // Add directional light
-  const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
-  directionalLight.position.set(1, 1, 1).normalize();
-  scene.add(directionalLight);
-  
-  return scene;
-}
-
 // Create a perspective camera
 export function createCamera(width, height, fov = 75) {
   const camera = new THREE.PerspectiveCamera(fov, width / height, 0.1, 1000);

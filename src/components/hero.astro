@@ -6,30 +6,32 @@ import SimpleTextEffect from "@/components/three/SimpleTextEffect.astro";
 
 <main
   class="grid lg:grid-cols-2 place-items-center pt-16 pb-8 md:pt-12 md:pb-24 relative z-10">
-  <div class="py-6 md:order-1 md:block w-full">
+  <div class="py-6 md:order-1 md:block w-full border-2 border-red-500">
     <!-- Image or visualization can be added here in the future -->
   </div>
   <div>
     <h1
       class="text-5xl lg:text-6xl xl:text-7xl font-bold lg:tracking-tight xl:tracking-tighter">
-      GTM Ventures, by Robert Douglass
+      GTM Ventures<br/> by Robert Douglass
     </h1>
     <p class="text-lg mt-4 text-slate-600 max-w-xl">
-      Expert consulting on Product-Market Fit, Go To Market, Agentic AI, and Model Context Protocol. Helping startups and enterprises leverage 20+ years of expertise in CMS, E-commerce, and Platform as a Service.
+      Expert consulting on Agentic AI, Model Context Protocol (MCP), Product-Market Fit, and Go To Market. 
+    </p>
+    <p class="text-lg mt-4 text-slate-600 max-w-xl">
+      I offer startups and enterprises my expertise and over 40 years of experience in technology, with focus on CMS, E-commerce, Platform-as-a-Service, Digital Identity, Blockchain, and AI.
     </p>
     <div class="mt-6 flex flex-col sm:flex-row gap-3">
       <Link
         href="/contact"
-        class="flex gap-1 items-center justify-center">
-        <Icon class="text-white w-5 h-5" name="bx:bxs-envelope" />
+        class="flex gap-1 items-center justify-center bg-gradient-to-r from-slate-800 to-slate-700 hover:from-slate-700 hover:to-slate-600 text-white border border-slate-600">
+        <Icon class="w-5 h-5" name="bx:bxs-envelope" />
         Contact Me
       </Link>
       <Link
         size="lg"
-        style="outline"
         href="/services"
-        class="flex gap-1 items-center justify-center">
-        <Icon class="text-black w-4 h-4" name="bx:bxs-briefcase" />
+        class="flex gap-1 items-center justify-center bg-gradient-to-r from-slate-800 to-slate-700 hover:from-slate-700 hover:to-slate-600 text-white border border-slate-600">
+        <Icon class="w-4 h-4" name="bx:bxs-briefcase" />
         View Services
       </Link>
     </div>

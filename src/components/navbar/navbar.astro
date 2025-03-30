@@ -4,6 +4,10 @@ import Link from "@/components/ui/link.astro";
 import Dropdown from "./dropdown.astro";
 import { Astronav, MenuItems, MenuIcon } from "astro-navbar";
 
+// Get current path to check if we're on homepage
+const currentPath = Astro.url.pathname;
+const isHomePage = currentPath === "/" || currentPath === "";
+
 // Ensure BASE_URL ends with a slash
 const baseUrl = import.meta.env.BASE_URL.endsWith('/') 
   ? import.meta.env.BASE_URL 
@@ -34,7 +38,7 @@ const menuitems = [
     <Astronav>
       <div class="flex w-full lg:w-auto items-center justify-between">
         <a href={baseUrl} class="text-lg"
-          ><span class="font-bold text-slate-800">GTM</span><span
+          ><span class={`font-bold ${isHomePage ? "text-slate-100" : "text-slate-800"}`}>GTM</span><span
             class="text-slate-600">Ventures</span
           >
         </a>
@@ -59,7 +63,11 @@ const menuitems = [
                   <li>
                     <a
                       href={item.path}
-                      class="flex lg:px-3 py-2 items-center text-gray-600 hover:text-gray-900">
+                      class={`flex lg:px-3 py-2 items-center ${
+                        isHomePage 
+                          ? "text-slate-300 hover:text-white" 
+                          : "text-gray-600 hover:text-gray-900"
+                      }`}>
                       <span> {item.title}</span>
                       {item.badge && (
                         <span class="ml-1 px-2 py-0.5 text-[10px] animate-pulse font-semibold uppercase text-white bg-indigo-600 rounded-full">

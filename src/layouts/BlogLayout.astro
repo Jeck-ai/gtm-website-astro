@@ -2,6 +2,7 @@
 import Container from "@/components/container.astro";
 import { getFormattedDate } from "@/utils/all";
 import Layout from "./Layout.astro";
+import MDXProvider from "@/components/MDXProvider.astro";
 
 const { frontmatter } = Astro.props;
 ---
@@ -36,7 +37,9 @@ const { frontmatter } = Astro.props;
     </div>
 
     <div class="mx-auto prose prose-lg mt-6">
-      <slot />
+      <MDXProvider>
+        <slot />
+      </MDXProvider>
     </div>
     <div class="text-center mt-8">
       <a

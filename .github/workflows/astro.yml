@@ -71,6 +71,16 @@ jobs:
             --site "${{ steps.pages.outputs.origin }}" \
             --base "${{ steps.pages.outputs.base_path }}"
         working-directory: ${{ env.BUILD_PATH }}
+      # Run our custom script to copy assets
+      - name: Copy blog assets
+        run: node src/scripts/copyAssets.js
+        working-directory: ${{ env.BUILD_PATH }}
+      # Debug step to verify assets in the build output
+      - name: Debug build output
+        run: |
+          echo "Listing dist directory structure:"
+          find dist -type f | grep -i ".png\|.jpg\|.jpeg\|.webp\|.svg" || echo "No image files found"
+        working-directory: ${{ env.BUILD_PATH }}
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:

@@ -1,0 +1,28 @@
+import { Image } from "astro:assets";
+
+// Import all blog images for optimization
+// This technique uses import.meta.glob to create a map of all images in the blog folder
+const images = import.meta.glob("../assets/blog/*.{png,jpg,jpeg,webp,gif,svg}", { eager: true });
+
+const { src, alt, width, height, class: className } = Astro.props;
+
+// Extract just the filename from the path (e.g., "/src/assets/blog/hero-talk-to-bird.png" -> "hero-talk-to-bird.png")
+const getFilename = (path) => {
+  const parts = path.split('/');
+  return parts[parts.length - 1];
+};
+
+// Find the correct image by matching the filename
+const filename = getFilename(src);
+const matchingImage = Object.entries(images).find(([key]) => key.includes(filename));
+
+// Use the matching image if found, otherwise fall back to the provided src
+const imgSrc = matchingImage ? matchingImage[1].default : src;
+
+<Image 
+  src={imgSrc} 
+  alt={alt || ""} 
+  width={width} 
+  height={height} 
+  class={className}
+/> 

@@ -1,0 +1,45 @@
+---
+import OptimizedImage from "./OptimizedImage.astro";
+---
+
+<article class="mdx-content">
+  <slot />
+</article>
+
+<style is:global>
+  /* Override default img tags in MDX content with our optimized images */
+  .mdx-content img {
+    max-width: 100%;
+    height: auto;
+  }
+</style>
+
+<script>
+  // Script to run in the browser to replace img tags with our optimized ones
+  document.addEventListener('DOMContentLoaded', () => {
+    const mdxContent = document.querySelector('.mdx-content');
+    if (!mdxContent) return;
+
+    const images = mdxContent.querySelectorAll('img');
+    
+    images.forEach(img => {
+      // Check if the image src includes paths that need to be fixed
+      if (img.src.includes('/src/assets/')) {
+        // Get just the filename
+        const srcParts = img.src.split('/');
+        const filename = srcParts[srcParts.length - 1];
+        
+        // Check if we're in GitHub Pages (with base path)
+        const isGitHubPages = window.location.pathname.includes('/gtm-website-astro');
+        
+        // Compute the correct path based on environment
+        const correctedSrc = isGitHubPages 
+          ? `/gtm-website-astro/assets/${filename}` 
+          : `/assets/${filename}`;
+        
+        // Update the image src
+        img.src = correctedSrc;
+      }
+    });
+  });
+</script> 

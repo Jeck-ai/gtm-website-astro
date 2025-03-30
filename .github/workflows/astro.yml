@@ -65,21 +65,27 @@ jobs:
       - name: Install dependencies
         run: ${{ steps.detect-package-manager.outputs.manager }} ${{ steps.detect-package-manager.outputs.command }}
         working-directory: ${{ env.BUILD_PATH }}
+      # Debug step to verify file structure before build
+      - name: Debug pre-build
+        run: |
+          echo "Listing src/assets/blog directory:"
+          ls -la src/assets/blog/
+          echo "Listing public/blog-images directory:"
+          ls -la public/blog-images/
+        working-directory: ${{ env.BUILD_PATH }}
       - name: Build with Astro
         run: |
           ${{ steps.detect-package-manager.outputs.runner }} astro build \
             --site "${{ steps.pages.outputs.origin }}" \
             --base "${{ steps.pages.outputs.base_path }}"
         working-directory: ${{ env.BUILD_PATH }}
-      # Run our custom script to copy assets
-      - name: Copy blog assets
-        run: node src/scripts/copyAssets.js
-        working-directory: ${{ env.BUILD_PATH }}
       # Debug step to verify assets in the build output
       - name: Debug build output
         run: |
           echo "Listing dist directory structure:"
           find dist -type f | grep -i ".png\|.jpg\|.jpeg\|.webp\|.svg" || echo "No image files found"
+          echo "Checking for blog-images in dist:"
+          ls -la dist/blog-images/ || echo "No blog-images directory found in dist"
         working-directory: ${{ env.BUILD_PATH }}
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3

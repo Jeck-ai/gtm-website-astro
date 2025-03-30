@@ -17,10 +17,12 @@ export default defineConfig({
   vite: {
     plugins: [tailwindcss()],
   },
-  // Add image configuration to ensure assets are processed correctly
+  // Asset configuration - make sure sharp is used
   image: {
     service: {
       entrypoint: 'astro/assets/services/sharp',
-    },
+    }
   },
+  // Ensure static build to avoid SSR issues
+  output: "static",
 });

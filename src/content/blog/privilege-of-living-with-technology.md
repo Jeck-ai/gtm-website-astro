@@ -3,7 +3,7 @@ draft: false
 title: "The Privilege of Living with Technology: A Lifetime of Innovation"
 snippet: "From early encounters with the Commodore 64 to current work with AI and the Model Context Protocol, explore a journey through one of the most transformative eras in human history."
 image: {
-    src: "/src/assets/blog/hero-talk-to-bird.png",
+    src: "/blog-images/hero-talk-to-bird.png",
     alt: "A visualization of human-animal communication"
 }
 publishDate: "2024-03-30 16:44"
@@ -12,7 +12,7 @@ author: "Robert Douglass"
 tags: [technology, innovation, AI, animal-communication, future]
 ---
 
-![A visualization of human-animal communication](/src/assets/blog/hero-talk-to-bird.png)
+![A visualization of human-animal communication](/blog-images/hero-talk-to-bird.png)
 
 Technology has always been a part of my life. Born in 1972, I've had the privilege of witnessing and participating in one of the most transformative eras of human history. From my first encounter with a Commodore 64 at age 10 to my current work with AI and the Model Context Protocol, I've been fortunate to both observe and contribute to our technological evolution.
 
@@ -31,7 +31,7 @@ Each of these breakthroughs has fundamentally altered how we live, work, and con
 
 ## From Childhood Dreams to Professional Reality
 
-![Early computing with Commodore 64](/src/assets/blog/cw64-agi.png)
+![Early computing with Commodore 64](/blog-images/cw64-agi.png)
 
 My fascination with technology began early. At 10 years old, I was programming on my Commodore 64, captivated by the ability to create something from nothing but logic and code. That early passion has guided my entire career, from contributing significant modules to Drupal and being present at the founding of Commerce Guys to my leadership roles at Platform.sh and work with various technological innovations.
 

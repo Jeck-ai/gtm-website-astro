@@ -1,0 +1,102 @@
+---
+import { isWebGLAvailable, createRenderer, createCamera, setupResizeHandler, setupMouseTracking, clearContainer } from './three-utils';
+---
+<div id="animated-cubes-background" class="fixed top-0 left-0 w-full h-full overflow-hidden" style="z-index: -10;"></div>
+
+<script>
+  import { isWebGLAvailable, createRenderer, createCamera, setupResizeHandler, setupMouseTracking, clearContainer } from './three-utils';
+  import * as THREE from 'three';
+
+  if (!isWebGLAvailable()) {
+    console.warn('WebGL is not available');
+    // Exit gracefully
+    const container = document.getElementById('animated-cubes-background');
+    if (container) container.style.display = 'none';
+  } else {
+    // Create scene
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x000000);
+    scene.background.alpha = 0.5;
+    
+    // Get container
+    const container = document.getElementById('animated-cubes-background');
+    if (!container) {
+      console.error('Container not found');
+    } else {
+      clearContainer(container);
+      
+      // Setup renderer and camera
+      const renderer = createRenderer(window.innerWidth, window.innerHeight);
+      const camera = createCamera(window.innerWidth, window.innerHeight);
+      camera.position.z = 15; // Override default camera position for this effect
+      
+      container.appendChild(renderer.domElement);
+      
+      // Create a group to hold all objects
+      const group = new THREE.Group();
+      scene.add(group);
+      
+      // Create multiple cubes with different colors and sizes
+      const colors = [0x3B82F6, 0x10B981, 0x6366F1, 0xf59e0b, 0xef4444];
+      
+      for (let i = 0; i < 50; i++) {
+        const size = Math.random() * 0.5 + 0.1;
+        const geometry = new THREE.BoxGeometry(size, size, size);
+        const material = new THREE.MeshBasicMaterial({ 
+          color: colors[Math.floor(Math.random() * colors.length)],
+          transparent: true,
+          opacity: 0.7 
+        });
+        
+        const cube = new THREE.Mesh(geometry, material);
+        
+        // Position cubes randomly in a sphere-like shape
+        const radius = 8;
+        const theta = Math.random() * Math.PI * 2;
+        const phi = Math.random() * Math.PI;
+        
+        cube.position.x = radius * Math.sin(phi) * Math.cos(theta);
+        cube.position.y = radius * Math.sin(phi) * Math.sin(theta);
+        cube.position.z = radius * Math.cos(phi);
+        
+        // Random rotation
+        cube.rotation.x = Math.random() * Math.PI;
+        cube.rotation.y = Math.random() * Math.PI;
+        
+        // Add to group
+        group.add(cube);
+      }
+      
+      // Setup mouse tracking
+      const mouseTracker = setupMouseTracking();
+      
+      // Setup resize handler
+      setupResizeHandler(camera, renderer, container);
+      
+      // Animation
+      function animate() {
+        requestAnimationFrame(animate);
+        
+        // Rotate the whole group
+        group.rotation.y += 0.005;
+        group.rotation.x += 0.002;
+        
+        // Add subtle movement based on mouse position
+        const mouseX = mouseTracker.getMouseX();
+        const mouseY = mouseTracker.getMouseY();
+        group.rotation.y += (mouseX / window.innerWidth) * 0.002;
+        group.rotation.x += (mouseY / window.innerHeight) * 0.002;
+        
+        // Animate individual cubes
+        group.children.forEach((cube, i) => {
+          cube.rotation.x += 0.01 * (i % 3 + 1) * 0.01;
+          cube.rotation.y += 0.01 * (i % 2 + 1) * 0.01;
+        });
+        
+        renderer.render(scene, camera);
+      }
+      
+      animate();
+    }
+  }
+</script>

@@ -55,19 +55,17 @@ Yet the practical implications are profound. We've created a bridge between huma
 
 Over the next decade, AI has the potential to benefit humanity in numerous meaningful ways:
 
-**Healthcare and Medicine**: From personalized treatments based on genetic and lifestyle data to AI-enhanced diagnostics and accelerated drug discovery, we're on the cusp of medical breakthroughs that could extend and improve countless lives.
+**Productivity**: I personally use AI tools in nearly every task I accomplish, and have the deep impression that I am between 2x-100x more effective at most tasks as a result. 
 
-**Education**: AI can help customize learning for individual students, reduce educational inequality through wider accessibility, and provide real-time support for skill development across disciplines.
+**Education**: AI can help customize learning for individual students, reduce educational inequality through wider accessibility, and provide real-time support for skill development across disciplines. 
 
-**Climate and Environment**: More precise climate modeling, optimized resource management, and enhanced biodiversity protection could help us address our most pressing environmental challenges.
-
-**Economic Productivity**: By automating routine tasks, supporting better decision-making, and enhancing human creativity, AI can drive innovation and efficiency across industries.
+**Climate and Environment**: More precise climate modeling, optimized resource management, and enhanced biodiversity protection could help us address our most pressing environmental challenges. (See the caveat below about AI's ecological footprint, though)
 
 **Transportation and Infrastructure**: Autonomous vehicles and smart cities promise safer, more efficient living environments with reduced environmental impact.
 
-**Social Well-being**: Improved accessibility technologies, more inclusive economic opportunities, and enhanced public services can create more equitable societies.
-
 **Scientific Discovery**: AI-driven analysis of massive datasets and complex simulations can accelerate breakthroughs in physics, astronomy, biology, and materials science.
+
+There are more areas where AI can help humanity, the list is long.
 
 ## Navigating the Risks
 

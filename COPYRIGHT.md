@@ -25,4 +25,4 @@ is copyrighted material and is **NOT** covered by the GPL-2.0 license. This cont
 
 To request permission to use any of the copyrighted content, please contact:
 
-Email: robert@jeck.ai 
+Email: robert@gtm-ventures.com 

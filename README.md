@@ -44,4 +44,4 @@ is copyrighted material and is **NOT** covered by the GPL-3.0 license. This cont
 
 For inquiries about the website or to request permission to use any copyrighted content:
 
-Email: robert@jeck.ai
+Email: robert@gtm-ventures.com

@@ -7,16 +7,21 @@ import "../styles/global.css";
 
 export interface Props {
   title: string;
+  ogImage?: string;
+  ogImageAlt?: string;
+  ogType?: string;
 }
 
 const canonicalURL = new URL(Astro.url.pathname, Astro.site).toString();
 
+const { title, ogImage, ogImageAlt, ogType } = Astro.props;
+
+// Default image if none is provided
+const defaultImage = "/cw64-agi-og-image-blended.jpeg";
 const resolvedImageWithDomain = new URL(
-  "/cw64-agi-og-image-blended.jpeg",
+  ogImage || defaultImage,
   Astro.site
 ).toString();
-
-const { title } = Astro.props;
 
 const makeTitle = title
   ? title + " | " + "GTM Ventures"
@@ -44,12 +49,12 @@ const makeTitle = title
       openGraph={{
         basic: {
           url: canonicalURL,
-          type: "website",
-          title: `GTM Ventures - Consultant for Digital Strategy`,
+          type: ogType || "website",
+          title: makeTitle,
           image: resolvedImageWithDomain,
         },
         image: {
-          alt: "GTM Ventures Homepage",
+          alt: ogImageAlt || "GTM Ventures Homepage",
         },
       }}
     />
